@@ -20,13 +20,7 @@ def callLUIS(queryText):
 		resp=None
 	return resp
 
-def getEmotion(message):
-	resp=callLUIS(message)
-	entities=parseEntities(resp)
-	if len(entities)>0 :
-		return entities[0]
-	else:
-		return ''
+
 
 def parseIntent(resp):
 	intent=''
@@ -40,17 +34,24 @@ def parseIntent(resp):
 			print 'intent not found'
 	return intent, score
 
-def parseEntities(resp):
+"""
+USAGE:
+emotion=parseEntities(message, 'Emotion')
+genre=parseEntities(message, 'Genre')
+"""
+def parseEntities(message, entity_type):
+	entity=''
 	entities=[]
+	resp=callLUIS(message)
 	if resp is not None:
 		try:
 			#print "entities" + str(resp['entities'])
 			#print type(resp['entities']), len(resp['entities'])
 			for ent in resp['entities']:
-				if ent['type']=='Emotion':
+				if ent['type']==entity_type:
 					entities.append(ent['entity'])
+			if len(entities)>0: entity=' '.join(entities)
 		except KeyError ,ke:
 			print 'entities not found'
-	return entities
+	return entity
 
-print getEmotion("find something heroic")
