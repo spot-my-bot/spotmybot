@@ -7,6 +7,7 @@ import sentiments
 import traceback
 import spotify
 import lyrics
+from luis_api import getEmotion
 
 chats = {}
 BOT_NAME = "SpotMyBot"
@@ -31,13 +32,16 @@ def handle_message(msg):
 					response = messages["not_understood"]
 				else:
 					response = messages[sentiment]
+			emotion=getEmotion(message)
+			print emotion
 			
 			#chats[chat_id]['history'].append(message)
 			first_name = msg["from"]["first_name"]
 
-			#bot_resp = callLUIS(input)
+			
 			response = response.replace("<NAME>", first_name)
 			response = response.replace("<BOTNAME>", BOT_NAME)
+			response = response.replace("<MOOD>", emotion)
 			print response
 
 			bot.sendMessage(chat_id, response)
