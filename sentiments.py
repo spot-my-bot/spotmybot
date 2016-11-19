@@ -3,7 +3,7 @@ import requests
 import json
 import sys
 
-def analyzeSentiments(text):
+def analyze_sentiment(text):
 	url = "http://text-processing.com/api/sentiment/"
 	proxy = urllib.getproxies()
 	data_text = requests.post(url, proxies=proxy, data={'text': text}).text
@@ -18,4 +18,4 @@ def analyzeSentiments(text):
 		return None
 
 if __name__ == '__main__':
-	print analyzeSentiments(sys.argv[1])
+	print analyze_sentiment(sys.argv[1])

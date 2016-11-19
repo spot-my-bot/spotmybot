@@ -24,7 +24,7 @@ def get_lyrics_songlyrics(artist, song, proxy):
 		page = requests.get(url, proxies=proxy)
 		parser = BeautifulSoup(page.text, 'html.parser')
 		lyrics = parser.find(id='songLyricsDiv').get_text()
-	except Exception:
+	except:
 		lyrics = ""
 	if "We do not have" in lyrics:
 		lyrics = ""
@@ -45,7 +45,7 @@ def get_lyrics_genius(artist, song, proxy):
 		lyrics = parser.find(attrs={'class': 'lyrics'}).get_text().strip()
 		if artist.lower().replace(" ", "") not in parser.text.lower().replace(" ", ""):
 			lyrics = ""
-	except Exception:
+	except:
 		lyrics = ""
 
 	return lyrics

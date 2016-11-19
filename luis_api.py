@@ -3,10 +3,11 @@ import requests
 from config import *
 
 luis_http_service ='https://api.projectoxford.ai/luis/v2.0/apps/ee569a80-115b-439f-a93d-3bfcdea54888?subscription-key=784bddb1f33f41adb474f784d12b3c0a&q=I%20feel%20sad&verbose=true'
+
 def callLUIS(queryText):
+	# Request headers
 	headers = {
-    # Request headers
-    'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY,
+    	'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY,
 	}
 	params={'q': queryText,
 		   'verbose' : 'True',
@@ -15,8 +16,6 @@ def callLUIS(queryText):
 	req= requests.get(base_url, params=params)
 	print req.text
 	return req.json()
-
-callLUIS("i feel sad")
 
 """
 try:
