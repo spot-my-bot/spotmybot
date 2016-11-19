@@ -10,7 +10,7 @@ def get_lyrics(artist, song):
 	proxy = urllib.getproxies()
 
 	for f in functions:
-		print("bla")
+		print "Searching for %s - %s" % (artist.encode('utf-8'), song.encode('utf-8'))
 		lyrics = f(artist, song, proxy)
 		if lyrics != "":
 			break

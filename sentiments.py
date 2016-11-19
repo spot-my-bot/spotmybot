@@ -13,7 +13,8 @@ def analyze_sentiment(text):
 
 	try:
 		data = json.loads(data_text)
-		return data["label"]
+		#return data["label"]
+		return data["probability"]["pos"]
 	except ValueError:
 		return None
 

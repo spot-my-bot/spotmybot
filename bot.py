@@ -1,23 +1,28 @@
 import sys
 import time
 import telepot
-#from luis_api import *
+
+# local modules
 from messages import messages
 import sentiments
 import traceback
 import spotify
 import lyrics
+import textanalysis
+
+BOT_NAME = "SpotMyBot"
+SENTIMENT_THRESHOLD = 0.3
 
 chats = {}
-BOT_NAME = "SpotMyBot"
 
 def handle_message(msg):
 	content_type, chat_type, chat_id = telepot.glance(msg)
 	response = ""
 	sentiment = ""
+	task = "info"
 
-	try:
-		if content_type == "text":
+	if content_type == "text":
+		try:
 			message = msg["text"]
 			print "Handling message: %s" % message
 
@@ -30,46 +35,68 @@ def handle_message(msg):
 				if sentiment is None:
 					response = messages["not_understood"]
 				else:
-					response = messages[sentiment]
+					if sentiment > 0.7:
+						response = messages["pos"]
+					elif sentiment < 0.3:
+						response = messages["neg"]
+					else:
+						response = messages["neutral"]
+					task = "find_song"
 			
-			#chats[chat_id]['history'].append(message)
+			chats[chat_id]['history'].append(message)
 			first_name = msg["from"]["first_name"]
 
-			#bot_resp = callLUIS(input)
 			response = response.replace("<NAME>", first_name)
 			response = response.replace("<BOTNAME>", BOT_NAME)
-			print response
 
 			bot.sendMessage(chat_id, response)
 
-			spotify_data = spotify.get_tracks(spotify_token, [message.split()[0]], 20)
+			if task != "find_song":
+				return
 
-			selected_song = spotify_data[0]
-			for song in spotify_data:
-				text = lyrics.get_lyrics(song["artist"], song["name"])
-				song_sentiment = sentiments.analyze_sentiment(text)
+			link = find_song([message.split()[0]], sentiment)
+			if link:
+				bot.sendMessage(chat_id, link)
+		except:
+			print "Error!"
+			print traceback.format_exc()
 
-				if song_sentiment == sentiment:
-					selected_song = song
-					break
+def find_song(search_words, sentiment):
+	spotify_data = spotify.get_tracks(spotify_token, search_words, 20)
 
-			link = selected_song["url"]
-			bot.sendMessage(chat_id, link)
+	if len(spotify_data) < 1:
+		return None
 
-	except Exception:
-		print "Error!"
-		print traceback.format_exc()
+	selected_song = spotify_data[0]
+	for song in spotify_data:
+		text = lyrics.get_lyrics(song["artist"], song["name"])
+		song_sentiment = sentiments.analyze_sentiment(text)
 
-if len(sys.argv) < 3:
-	print "Usage: python %s <TELEGRAM_TOKEN> <SPOTIFY_TOKEN>" % sys.argv[0]
-	sys.exit(1)
+		if song_sentiment is None:
+			continue
 
-telegram_token = sys.argv[1]
-spotify_token = sys.argv[2]
-bot = telepot.Bot(telegram_token)
-bot.message_loop(handle_message)
-print 'Waiting for messages...'
+		if abs(song_sentiment - sentiment) <= SENTIMENT_THRESHOLD:
+			selected_song = song
+			break
 
-while 1:
-	sys.stdout.flush()
-	time.sleep(1)
+	return selected_song["url"]
+
+def main():
+	global telegram_token, spotify_token, bot
+
+	if len(sys.argv) < 3:
+		print "Usage: python %s <TELEGRAM_TOKEN> <SPOTIFY_TOKEN>" % sys.argv[0]
+		sys.exit(1)
+
+	telegram_token = sys.argv[1]
+	spotify_token = sys.argv[2]
+	bot = telepot.Bot(telegram_token)
+	bot.message_loop(handle_message)
+	print 'Waiting for messages...'
+
+	while 1:
+		sys.stdout.flush()
+		time.sleep(1)
+
+if __name__ == '__main__':
+	main()

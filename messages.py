@@ -1,3 +1,5 @@
+# use <NAME> for the user's first name and <BOTNAME> for the Bot's username
+
 messages = {
 	"introduction": "Hi <NAME>. I'm <BOTNAME>, I can have Spotify play music for you according to your current mood. Tell me how you feel and I'll see what I can come up with. If you prefer certain genres or if there's music which is a no-go to you, you can just tell me.",
 	"neg": "I'm sorry to hear that, <NAME>. Let me cheer you up!",
