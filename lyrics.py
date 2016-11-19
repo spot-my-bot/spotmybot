@@ -1,11 +1,12 @@
 from bs4 import BeautifulSoup
 import urllib
 import sys
+import re
 
 def get_lyrics(artist, song):
 	functions = [get_lyrics_songlyrics, get_lyrics_musixmatch]
 	lyrics = ""
-	proxy = urllib.request.getproxies()
+	proxy = urllib.getproxies()
 
 	for f in functions:
 		lyrics = f(artist, song, proxy)
@@ -55,6 +56,6 @@ def get_artist_song(info_string):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 3:
-		print "Usage: python %s <artist> <song>"
+		print "Usage: python %s <artist> <song>" % sys.argv[0]
 	else:
 		print get_lyrics(sys.argv[1], sys.argv[2])
