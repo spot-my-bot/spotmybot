@@ -7,15 +7,14 @@ def get_speech_tags(text):
     nouns = []
     verbs = []
     adjectives = []
-    comperatives = []
+    comparatives = []
     for word in doc:
         if word.tag_.startswith('NN'):
-            nouns.append(word)
+            nouns.append(str(word))
         elif word.tag_.startswith('VB'):
-            verbs.append(word)
+            verbs.append(str(word))
         elif word.tag_ == 'JJ':
-            adjectives.append(word)
+            adjectives.append(str(word))
         elif word.tag_ == 'JJR' or word.tag_ == 'RBR':
-            comperatives.append(word)
-    return {'nouns':nouns, 'verbs':verbs, 'adjectives':adjectives, 'comperatives':comperatives}
-
+            comparatives.append(str(word))
+    return {'nouns':nouns, 'verbs':verbs, 'adjectives':adjectives, 'comparatives':comparatives}
