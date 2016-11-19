@@ -5,16 +5,17 @@ import sys
 import re
 
 def get_lyrics(artist, song):
-	functions = [get_lyrics_musixmatch, get_lyrics_songlyrics]
+	functions = [get_lyrics_genius]#, get_lyrics_songlyrics]
 	lyrics = ""
 	proxy = urllib.getproxies()
 
 	for f in functions:
+		print("bla")
 		lyrics = f(artist, song, proxy)
 		if lyrics != "":
 			break
 
-	return lyrics
+	return lyrics.encode('utf-8')
 
 def get_lyrics_songlyrics(artist, song, proxy):
 	lyrics = ""
@@ -32,19 +33,18 @@ def get_lyrics_songlyrics(artist, song, proxy):
 
 	return lyrics
 
-def get_lyrics_musixmatch(artist, song, proxy):
+def get_lyrics_genius(artist, song, proxy):
 	lyrics = ""
 	try:
-		url_search = "http://musicmatch.com/search/%s %s" % (artist, song)
-		results = requests.get(url_search, proxies = proxy)
+		search_url = "http://genius.com/search?q=%s %s" % (artist, song)
+		results = requests.get(search_url, proxies=proxy)
 		parser = BeautifulSoup(results.text, 'html.parser')
-		urls = re.findall('"track_share_url":"(http[s?]://www\.musixmatch\.com/lyrics/.+?","', parser.text)
-		page = requests.get(urls[0], proxies=proxy)
+		url = str(parser).split('song_link" href="')[1].split('" title=')[0]
+		page = requests.get(url, proxies=proxy)
 		parser = BeautifulSoup(page.text, 'html.parser')
-		lyrics = parser.find(attrs={'class': 'mxm-lyrics'}).find('span').get_text()
-		#lyrics = soup.text.split('"body":"')[1].split('","language"')[0]
-		lyrics = lyrics.replace("\\n", "\n")
-		lyrics = lyrics.replace("\\", "")
+		lyrics = parser.find(attrs={'class': 'lyrics'}).get_text().strip()
+		if artist.lower().replace(" ", "") not in parser.text.lower().replace(" ", ""):
+			lyrics = ""
 	except Exception:
 		lyrics = ""
 
