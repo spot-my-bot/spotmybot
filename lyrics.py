@@ -5,7 +5,7 @@ import sys
 import re
 
 def get_lyrics(artist, song):
-	functions = [get_lyrics_genius]#, get_lyrics_songlyrics]
+	functions = [get_lyrics_genius, get_lyrics_songlyrics]
 	lyrics = ""
 	proxy = urllib.getproxies()
 
