@@ -9,9 +9,6 @@ A skeleton for your telepot programs.
 """
 
 def handle(msg):
-    #flavor = telepot.flavor(msg)
-
-    #summary = telepot.glance(msg, flavor=flavor)
 	content_type, chat_type, chat_id = telepot.glance(msg)
 	print(content_type, chat_type, chat_id)
 
@@ -20,11 +17,18 @@ def handle(msg):
 		#print(msg['text'])
 		input = str(msg['text']).lower()
 		bot_resp= callLUIS(input)
+		action,score=parseIntent(bot_resp)
+		entities=parseEntities(bot_resp)
+		#pass entities as search criteria
+		
 		bot.sendMessage(chat_id,'Hallo '+ msg['from']['first_name']+'!')
-    	bot.sendMessage(chat_id, bot_resp)
+    	#bot.sendMessage(chat_id, action)
+		#bot.sendMessage(chat_id, (entities))
+		
+		#display song 
 
 
-TOKEN = sys.argv[1]  # 285502531:AAGPJIPn0aEmqVdXUvKptWTSN5x9RGIIph8
+TOKEN = sys.argv[1]  
 
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle)

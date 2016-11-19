@@ -2,7 +2,7 @@ import os, sys
 import requests
 from config import *
 
-luis_http_service ='https://api.projectoxford.ai/luis/v2.0/apps/ee569a80-115b-439f-a93d-3bfcdea54888?subscription-key=784bddb1f33f41adb474f784d12b3c0a&q=I%20feel%20sad&verbose=true'
+
 def callLUIS(queryText):
 	headers = {
     # Request headers
@@ -14,9 +14,38 @@ def callLUIS(queryText):
 	base_url='https://api.projectoxford.ai/luis/v2.0/apps/{appId}'.format(appId=LUIS_APP_ID)
 	req= requests.get(base_url, params=params)
 	print req.text
-	return req.json()
+	if req.status_code==200:
+		resp=req.json()
+	else:
+		resp=None
+	return resp
 
-callLUIS("i feel sad")
+def parseIntent(resp):
+	intent=''
+	score=0.0
+	if resp is not None:
+		print resp['topScoringIntent']
+		try:
+			intent=resp['topScoringIntent']['intent']
+			score=resp['topScoringIntent']['score']
+		except KeyError, ke:
+			print 'intent not found'
+	return intent, score
+
+def parseEntities(resp):
+	entities=[]
+	if resp is not None:
+		try:
+			#print "entities" + str(resp['entities'])
+			#print type(resp['entities']), len(resp['entities'])
+			for ent in resp['entities']:
+				entities.append([ent['type'],ent['entity'], ent['score']])
+			#entity_name = resp['entities'][0]['entity']
+			#entity_type = resp['entities'][0]['type']
+		except KeyError ,ke:
+			print 'entities not found'
+	return entities
+
 
 """
 try:
