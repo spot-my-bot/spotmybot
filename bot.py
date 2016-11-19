@@ -9,7 +9,7 @@ import traceback
 import spotify
 import lyrics
 import textanalysis
-
+from luis_api import parseEntities
 BOT_NAME = "SpotMyBot"
 SENTIMENT_THRESHOLD = 0.3
 
@@ -45,9 +45,11 @@ def handle_message(msg):
 			
 			chats[chat_id]['history'].append(message)
 			first_name = msg["from"]["first_name"]
-
+			emotion=parseEntities(message, 'Emotion')
+			
 			response = response.replace("<NAME>", first_name)
 			response = response.replace("<BOTNAME>", BOT_NAME)
+			response = response.replace("<MOOD>", emotion)
 
 			bot.sendMessage(chat_id, response)
 
