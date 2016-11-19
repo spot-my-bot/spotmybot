@@ -1,10 +1,11 @@
 from bs4 import BeautifulSoup
 import urllib
+import requests
 import sys
 import re
 
 def get_lyrics(artist, song):
-	functions = [get_lyrics_songlyrics, get_lyrics_musixmatch]
+	functions = [get_lyrics_musixmatch, get_lyrics_songlyrics]
 	lyrics = ""
 	proxy = urllib.getproxies()
 
@@ -40,7 +41,8 @@ def get_lyrics_musixmatch(artist, song, proxy):
 		urls = re.findall('"track_share_url":"(http[s?]://www\.musixmatch\.com/lyrics/.+?","', parser.text)
 		page = requests.get(urls[0], proxies=proxy)
 		parser = BeautifulSoup(page.text, 'html.parser')
-		lyrics = soup.text.split('"body":"')[1].split('","language"')[0]
+		lyrics = parser.find(attrs={'class': 'mxm-lyrics'}).find('span').get_text()
+		#lyrics = soup.text.split('"body":"')[1].split('","language"')[0]
 		lyrics = lyrics.replace("\\n", "\n")
 		lyrics = lyrics.replace("\\", "")
 	except Exception:
